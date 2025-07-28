@@ -9,6 +9,10 @@
     "./package.json": "./package.json",
     ".": {
       "import": "./dist/index.js"
+    },
+    "./schemas": {
+      "import": "./dist/schemas.js",
+      "types": "./dist/schemas/index.d.ts"
     }
   },
   "files": [
