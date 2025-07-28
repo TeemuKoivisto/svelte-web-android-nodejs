@@ -1,0 +1,34 @@
+{
+  "name": "@/db",
+  "version": "0.0.1",
+  "private": true,
+  "main": "generated/index.js",
+  "types": "generated/index.d.ts",
+  "browser": "generated/index-browser.js",
+  "type": "commonjs",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./generated/index.js"
+    }
+  },
+  "scripts": {
+    "prod:migrate": "prisma migrate deploy",
+    "build": "prisma generate",
+    "migrate": "prisma migrate dev && ts-node ./prisma/zod-schemas.ts",
+    "delete": "prisma migrate reset",
+    "format": "prisma format",
+    "reset": "prisma migrate reset && ts-node ./prisma/seed.ts && ts-node ./prisma/zod-schemas.ts",
+    "seed": "ts-node ./prisma/seed.ts",
+    "zod": "ts-node ./prisma/zod-schemas.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "prisma": "^6.12.0",
+    "ts-node": "^10.9.2",
+    "zod-prisma-types": "^3.2.4"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.12.0"
+  }
+}

@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:17.5-alpine
+    ports:
+      - 5532:5432
+    environment:
+      POSTGRES_PASSWORD: pg-password
+      POSTGRES_USER: pg-user
+      POSTGRES_DB: local_test_db
+    volumes:
+      - ./vol/postgres:/var/lib/postgresql/data
+
+networks:
+  default:
+    name: my-app-local

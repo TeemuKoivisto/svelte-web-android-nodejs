@@ -55,3 +55,20 @@ tmp/
 # Svelte
 package
 .svelte-kit
+
+# Prisma
+**/db/generated
+packages/db/zod
+.prisma
+
+# Docker volumes
+vol/**
+
+# Ansible
+.ansible/**/hosts
+*.inventory
+
+# Terraform
+.terraform
+*.backup
+.tfvars

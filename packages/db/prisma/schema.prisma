@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated"
+}
+
+generator zod {
+  createRelationValuesTypes = true
+  output                    = "../zod"
+  provider                  = "zod-prisma-types"
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("account")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  expires      DateTime
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+enum UserStatus {
+  // Disabled by an admin, preventing log in
+  DISABLED
+  // Fully functional user
+  ACTIVE
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String
+  email         String     @unique
+  emailVerified DateTime?
+  image         String?
+  status        UserStatus
+  settings      Json       @default("{}")
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  @@map("users")
+}
