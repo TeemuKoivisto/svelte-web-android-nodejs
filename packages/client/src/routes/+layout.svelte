@@ -15,9 +15,7 @@
 
 <div class="flex-col items-center">
   <Navbar />
-  <main
-    class="mx-[auto] flex h-full min-h-[calc(100vh-64px)] max-w-[860px] flex-col items-center"
-  >
+  <main class="mx-[auto] flex h-full min-h-[calc(100vh-64px)] max-w-[860px] flex-col items-center">
     {@render children()}
   </main>
 </div>

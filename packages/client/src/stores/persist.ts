@@ -1,5 +1,5 @@
 import { get, type Writable } from 'svelte/store'
-import type { Result } from '@/lib'
+import type { Result } from '@org/lib'
 
 interface Options<T, P> {
   /** Key by which the data is persisted */

@@ -68,10 +68,10 @@ importers:
 
   packages/api:
     dependencies:
-      '@/db':
+      '@org/db':
         specifier: workspace:*
         version: link:../db
-      '@/lib':
+      '@org/lib':
         specifier: workspace:*
         version: link:../lib
       jose:
@@ -117,15 +117,15 @@ importers:
 
   packages/client:
     dependencies:
-      '@/lib':
-        specifier: workspace:*
-        version: link:../lib
       '@iconify-icons/mdi':
         specifier: ^1.2.48
         version: 1.2.48
       '@iconify/svelte':
         specifier: ^5.0.1
         version: 5.0.1(svelte@5.37.0)
+      '@org/lib':
+        specifier: workspace:*
+        version: link:../lib
       luxon:
         specifier: ^3.7.1
         version: 3.7.1
@@ -206,9 +206,6 @@ importers:
 
   packages/lib:
     devDependencies:
-      '@/db':
-        specifier: workspace:*
-        version: link:../db
       '@types/luxon':
         specifier: ^3.6.2
         version: 3.6.2

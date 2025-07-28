@@ -1,5 +1,5 @@
 {
-  "name": "@/client",
+  "name": "@org/client",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -16,7 +16,7 @@
     "test": "TZ=UTC-3 vitest run"
   },
   "devDependencies": {
-    "@/lib": "workspace:*",
+    "@org/lib": "workspace:*",
     "@internationalized/date": "^3.8.2",
     "@lucide/svelte": "^0.515.0",
     "@sveltejs/adapter-static": "^3.0.8",
@@ -36,7 +36,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@/lib": "workspace:*",
+    "@org/lib": "workspace:*",
     "@iconify/svelte": "^5.0.1",
     "@iconify-icons/mdi": "^1.2.48",
     "luxon": "^3.7.1",

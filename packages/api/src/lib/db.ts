@@ -1,4 +1,4 @@
-import { PrismaClient } from '@/db'
+import { PrismaClient } from '@org/db'
 
 declare global {
   var cachedPrisma: PrismaClient

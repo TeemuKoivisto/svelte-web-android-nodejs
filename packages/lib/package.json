@@ -1,5 +1,5 @@
 {
-  "name": "@/lib",
+  "name": "@org/lib",
   "version": "0.0.1",
   "private": true,
   "main": "dist/index.js",
@@ -24,13 +24,11 @@
     "watch": "vite build --watch"
   },
   "devDependencies": {
-    "@/db": "workspace:*",
     "@types/luxon": "^3.6.2",
     "luxon": "^3.7.1",
     "zod": "^3.25.76"
   },
   "peerDependencies": {
-    "@/db": "workspace:*",
     "@types/luxon": "^3.4.2",
     "luxon": "^3.5.0",
     "zod": "^3.25.76"

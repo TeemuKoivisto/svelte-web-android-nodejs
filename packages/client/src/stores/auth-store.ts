@@ -3,7 +3,7 @@ import { derived, get, writable } from 'svelte/store'
 
 import { persist, reset } from './persist'
 import { authApi } from '$api/request'
-import type { User } from '@/lib/schemas'
+import type { User } from '@org/lib/schemas'
 
 type ClientUser = Omit<User, 'password'>
 

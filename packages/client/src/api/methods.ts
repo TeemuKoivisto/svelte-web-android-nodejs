@@ -1,4 +1,4 @@
-import { type Result, wrappedFetch } from '@/lib'
+import { type Result, wrappedFetch } from '@org/lib'
 
 // import {API_URL} from '$config'
 

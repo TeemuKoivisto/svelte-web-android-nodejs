@@ -6,7 +6,7 @@ import { AUDIENCE, findOrCreateGithubUser, ISSUER } from '$lib/auth'
 import { dev } from '$app/environment'
 import { env } from '$env/dynamic/private'
 
-import { AUTH_RESP } from '@/lib/schemas'
+import { AUTH_RESP } from '@org/lib/schemas'
 import type { RequestHandler } from './$types'
 import type { z } from 'zod'
 import type { Endpoints } from '@octokit/types'

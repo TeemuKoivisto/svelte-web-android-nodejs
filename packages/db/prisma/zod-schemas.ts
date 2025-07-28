@@ -4,22 +4,32 @@ import { fileURLToPath } from 'url'
 
 /**
  * Writes zod/index.ts to lib as base schema
- * @param inputPath
+ * @param zod
  * @returns
  */
-async function processZodIndex(inputPath: string) {
-  const content = await fs.readFile(inputPath, 'utf-8')
+async function processZodIndex(zodContent: string) {
   const processedLines: string[] = []
-  for (const line of content.split('\n')) {
+  let skipping = false
+  for (const line of zodContent.split('\n')) {
     if (line.trim() === '// SELECT & INCLUDE') {
       break
-    } else if (line.includes("import { Prisma } from '../generated'")) {
-      processedLines.push("import { Prisma } from '@/db'")
+    } else if (line.includes("import { z } from 'zod'")) {
+      processedLines.push(line, '')
+      skipping = true
+    } else if (line.includes('JsonValueSchema')) {
+      processedLines.push(line)
+      skipping = false
+    } else if (
+      line.includes('JsonNullValueInputSchema') ||
+      line.includes('JsonNullValueFilterSchema') ||
+      line.includes('.transform((v) => transformJsonNull(v))')
+    ) {
+      // Skip these lines as they include Prisma.JsonNull imports
     } else if (line.includes('export type Session = z.infer<typeof SessionSchema>')) {
       processedLines.push(line.replace(/type Session/g, 'type SessionDB'))
     } else if (line.includes('instanceof(Buffer)')) {
       processedLines.push(line.replace(/z\.instanceof\(Buffer\)/g, 'z.any()'))
-    } else {
+    } else if (!skipping) {
       processedLines.push(line)
     }
   }
@@ -31,11 +41,16 @@ export async function main() {
   // const __filename = fileURLToPath(import.meta.url)
   // const __dirname = path.dirname(__filename)
 
-  const inputPath = path.join(__dirname, '../zod/index.ts')
+  const zodPath = path.join(__dirname, '../zod/index.ts')
+  const prismaTypesPath = path.join(__dirname, './prisma-types.ts')
   const outputPath = path.join(__dirname, '../../lib/src/schemas/prisma.ts')
 
-  const lines = await processZodIndex(inputPath)
-  await fs.writeFile(outputPath, lines.join('\n'), 'utf-8')
+  const [zod, prismaTypes] = await Promise.all([
+    fs.readFile(zodPath, 'utf-8'),
+    fs.readFile(prismaTypesPath, 'utf-8')
+  ])
+  const lines = await processZodIndex(zod)
+  await fs.writeFile(outputPath, lines.join('\n').concat('\n\n', prismaTypes), 'utf-8')
   console.log(`Wrote ${lines.length} lines`)
   console.log('Schemas updated successfully!')
 }

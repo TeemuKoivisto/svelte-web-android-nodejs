@@ -3,8 +3,8 @@ import { base64url, jwtVerify } from 'jose'
 import { db } from '$lib/db'
 
 import type { Endpoints } from '@octokit/types'
-import type { GoogleProfile } from '@/lib/schemas'
-import { UserStatus, type PrismaClient } from '@/db'
+import type { GoogleProfile } from '@org/lib/schemas'
+import { UserStatus, type PrismaClient } from '@org/db'
 
 export type GitHubUserData = Endpoints['GET /user']['response']['data']
 
