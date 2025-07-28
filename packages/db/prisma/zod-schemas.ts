@@ -50,7 +50,15 @@ export async function main() {
     fs.readFile(prismaTypesPath, 'utf-8')
   ])
   const lines = await processZodIndex(zod)
-  await fs.writeFile(outputPath, lines.join('\n').concat('\n\n', prismaTypes), 'utf-8')
+  await fs.writeFile(
+    outputPath,
+    lines
+      .join('\n')
+      .replaceAll('Prisma.JsonValue', 'JsonValue')
+      .replaceAll('Prisma.InputJsonValue', 'InputJsonValue')
+      .concat('\n\n', prismaTypes),
+    'utf-8'
+  )
   console.log(`Wrote ${lines.length} lines`)
   console.log('Schemas updated successfully!')
 }
