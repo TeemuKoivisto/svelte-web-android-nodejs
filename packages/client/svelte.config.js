@@ -20,6 +20,7 @@ const config = {
       $hooks: 'src/hooks',
       $lib: 'src/lib',
       $modals: 'src/modals',
+      $shadcn: 'src/shadcn',
       $stores: 'src/stores',
       $utils: 'src/utils'
     }

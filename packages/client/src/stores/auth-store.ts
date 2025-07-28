@@ -19,13 +19,13 @@ tokenExpires.subscribe(exp => {
   if (exp !== null) {
     setTimeout(() => {
       if (Date.now() > exp) {
-        authActions.logout()
+        authStore.logout()
       }
     }, exp - Date.now())
   }
 })
 
-export const authActions = {
+export const authStore = {
   async githubCallback(): Promise<ReturnType<typeof authApi.authGithub>> {
     const url = new URL(location.href)
     const code = url.searchParams.get('code')
