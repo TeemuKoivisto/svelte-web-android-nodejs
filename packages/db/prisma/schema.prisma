@@ -42,13 +42,13 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  expires      DateTime
+  user_id    String   @id
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  oauthToken String?
+  jwt        String   @unique
+  expires_at DateTime
 
-  user_id String
-  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
+  @@index([jwt])
   @@map("session")
 }
 

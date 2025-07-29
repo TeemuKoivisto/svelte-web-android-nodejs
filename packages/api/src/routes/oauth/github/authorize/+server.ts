@@ -18,25 +18,27 @@ export const POST: RequestHandler = async event => {
   }
   const dbUser = await findOrCreateGithubUser(github.data.githubUser, db)
   const { jwt, exp } = await signJwt(dbUser)
-  // const session = {
-  //   oauth: {
-  //     id: githubUser.id.toString(),
-  //     avatar_url: githubUser.avatar_url,
-  //     author: githubUser.login,
-  //     origin: 'github'
-  //   },
-  //   access_token: result.access_token
-  // }
-  // await db.session.up
-  // await event.platform.env.SESSIONS_KV.put(jwt, JSON.stringify(session), {
-  //   expirationTtl: monthExpiry
-  // })
+  const expires_at = new Date(exp * 1000)
+  const _session = await db.session.upsert({
+    where: { user_id: dbUser.id },
+    create: {
+      oauthToken: github.data.access_token,
+      jwt,
+      user_id: dbUser.id,
+      expires_at
+    },
+    update: {
+      oauthToken: github.data.access_token,
+      jwt,
+      expires_at
+    }
+  })
   event.cookies.set('session', jwt, {
     path: '/',
     httpOnly: true,
     sameSite: 'strict',
     secure: !dev,
-    expires: new Date(exp * 1000)
+    expires: expires_at
   })
   const resp: z.infer<typeof AUTH_RESP> = {
     user: dbUser,

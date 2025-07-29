@@ -60,7 +60,7 @@ export const AccountScalarFieldEnumSchema = z.enum([
   'user_id'
 ])
 
-export const SessionScalarFieldEnumSchema = z.enum(['id', 'sessionToken', 'expires', 'user_id'])
+export const SessionScalarFieldEnumSchema = z.enum(['user_id', 'oauthToken', 'jwt', 'expires_at'])
 
 export const UserScalarFieldEnumSchema = z.enum([
   'id',
@@ -147,10 +147,10 @@ export const AccountWithRelationsSchema: z.ZodType<AccountWithRelations> = Accou
 /////////////////////////////////////////
 
 export const SessionSchema = z.object({
-  id: z.string().cuid(),
-  sessionToken: z.string(),
-  expires: z.coerce.date(),
-  user_id: z.string()
+  user_id: z.string(),
+  oauthToken: z.string().nullable(),
+  jwt: z.string(),
+  expires_at: z.coerce.date()
 })
 
 export type SessionDB = z.infer<typeof SessionSchema>
