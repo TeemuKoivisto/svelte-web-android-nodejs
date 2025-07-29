@@ -16,15 +16,17 @@
   import { dropAnimation, sensors } from './dnd-utils'
 
   import { tasksMap, taskStore } from '$stores/task-store'
-  import { STORE_TASK, type StoreTask, type TaskStatusType } from '@org/lib/schemas'
-  import z from 'zod'
+  import { TaskStatusSchema, type StoreTask, type TaskStatusType } from '@org/lib/schemas'
 
   let tasks = $state<StoreTask[]>([])
   let activeId = $state<string | null>(null)
 
-  const activeTask = $derived(tasks.find(task => task.id === activeId))
-  const done = $derived(tasks.filter(task => task.status === 'DONE'))
-  const inProgress = $derived(tasks.filter(task => task.status === 'IN_PROGRESS'))
+  const activeTask = $derived(tasks.find(t => t.id === activeId))
+  const backlog = $derived(tasks.filter(t => t.status === 'BACKLOG'))
+  const todos = $derived(tasks.filter(t => t.status === 'TODO'))
+  const inprogress = $derived(tasks.filter(t => t.status === 'IN_PROGRESS'))
+  const blocked = $derived(tasks.filter(t => t.status === 'BLOCKED'))
+  const done = $derived(tasks.filter(t => t.status === 'DONE'))
 
   tasksMap.subscribe(map => {
     tasks = Array.from(map.values())
@@ -35,15 +37,19 @@
   }
 
   function handleDragEnd({ active, over }: DragEndEvent) {
-    if (!over) return
+    if (!over || !activeId) return
 
     // console.log('dropped to', over)
-    if (over.id === 'DONE' || over.id === 'IN_PROGRESS') {
+    let overStatus: TaskStatusType | undefined
+    try {
+      overStatus = TaskStatusSchema.parse(over.id)
+    } catch (err) {}
+    if (overStatus) {
       const found = tasks.find(todo => todo.id === active.id)
       if (found) {
-        found.status = over.id as TaskStatusType
-        taskStore.update(activeId as string, {
-          status: over.id as TaskStatusType
+        found.status = overStatus
+        taskStore.update(activeId, {
+          status: overStatus
         })
       }
       return
@@ -58,7 +64,7 @@
     tasks = arrayMove(tasks, oldIndex, newIndex)
 
     // @TODO save new order to db
-    const old = $tasksMap.get(activeId as string)
+    const old = $tasksMap.get(activeId)
     if (old?.status !== activeTask.status) {
       taskStore.update(activeTask.id, {
         status: activeTask.status
@@ -89,9 +95,9 @@
 
   const [send, recieve] = crossfade({ duration: 100 })
 
-  function createTask() {
+  function createTask(status: TaskStatusType) {
     taskStore.create({
-      status: 'IN_PROGRESS',
+      status,
       title: 'untitled'
     })
   }
@@ -104,7 +110,10 @@
   onDragOver={handleDragOver}
 >
   <div class="grid gap-4 md:grid-cols-2">
-    {@render taskList('IN_PROGRESS', 'In Progress', inProgress)}
+    {@render taskList('BACKLOG', 'Backlog', backlog)}
+    {@render taskList('TODO', 'Todo', todos)}
+    {@render taskList('IN_PROGRESS', 'In Progress', inprogress)}
+    {@render taskList('BLOCKED', 'Blocked', blocked)}
     {@render taskList('DONE', 'Done', done)}
   </div>
 
@@ -117,26 +126,26 @@
 
 {#snippet taskList(id: TaskStatusType, title: string, tasks: StoreTask[])}
   <SortableContext items={tasks}>
-    <Droppable class="rd-3xl bg-gray-100 p-3 pt-6" {id}>
-      <p class="fw-bold pb-3 text-lg">{title}</p>
-
-      <div class="grid gap-2">
-        {#each tasks as task (task.id)}
-          <div class="" in:recieve={{ key: task.id }} out:send={{ key: task.id }}>
-            <SortableItem {task} />
-          </div>
-        {/each}
+    <div class="rd-3xl flex flex-col bg-gray-100 pt-3">
+      <Droppable class="flex-grow p-2 pb-0" {id}>
+        <p class="fw-bold ml-3 pb-3 text-lg">{title}</p>
+        <div class="grid gap-2">
+          {#each tasks as task (task.id)}
+            <div class="" in:recieve={{ key: task.id }} out:send={{ key: task.id }}>
+              <SortableItem {task} />
+            </div>
+          {/each}
+        </div>
+      </Droppable>
+      <div class="mr-2 group-hover:visible">
+        <button
+          class="m-2 flex cursor-pointer items-center justify-between rounded-md px-2 py-1 pr-4 text-sm font-medium hover:bg-gray-200"
+          onclick={() => createTask(id)}
+        >
+          <Icon icon={plus} width={16} height={16} />
+          <span class="ml-2">New task</span>
+        </button>
       </div>
-    </Droppable>
+    </div>
   </SortableContext>
 {/snippet}
-
-<div class="mr-2 group-hover:visible">
-  <button
-    class="m-2 flex items-center justify-between rounded-md px-2 py-1 pr-4 text-sm font-medium hover:bg-gray-100"
-    onclick={createTask}
-  >
-    <Icon icon={plus} width={16} height={16} />
-    <span class="ml-2">New task</span>
-  </button>
-</div>

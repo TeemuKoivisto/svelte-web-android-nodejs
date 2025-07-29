@@ -24,7 +24,7 @@ export const oauth = {
       location: z.string()
     })
   }
-} satisfies Record<string, Handler>
+}
 
 export const tasks = {
   'POST /api/tasks': {
@@ -48,7 +48,7 @@ export const tasks = {
 const api = {
   ...oauth,
   ...tasks
-}
+} satisfies Record<string, Handler>
 
 type InferBody<K extends keyof typeof api> = (typeof api)[K] extends { body: z.ZodTypeAny }
   ? z.infer<(typeof api)[K]['body']>
