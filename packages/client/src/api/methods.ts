@@ -1,8 +1,6 @@
 import { type Result, wrappedFetch } from '@org/lib'
 
-// import {API_URL} from '$config'
-
-const API_URL = ''
+import { API_URL } from '$config'
 
 export const DEFAULT_HEADERS = {
   Accept: 'application/json',

@@ -14,6 +14,12 @@ export default defineConfig({
       $utils: resolve('./src/utils')
     }
   },
+  // optimizeDeps: {
+  //   include: ['@org/db']
+  // },
+  server: {
+    port: 5180
+  },
   test: {
     globals: true,
     environment: 'jsdom',

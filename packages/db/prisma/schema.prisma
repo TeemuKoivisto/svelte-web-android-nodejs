@@ -8,8 +8,9 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated"
+  provider     = "prisma-client"
+  output       = "../generated"
+  moduleFormat = "esm"
 }
 
 generator zod {
@@ -71,6 +72,31 @@ model User {
 
   accounts Account[]
   sessions Session[]
+  tasks    Task[]
 
   @@map("users")
+}
+
+enum TaskStatus {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  BLOCKED
+  DONE
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  title       String
+  content     Json       @default("{}")
+  status      TaskStatus
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  archived_at DateTime?
+  trashed_at  DateTime?
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("task")
 }

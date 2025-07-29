@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@org/db'
+import type { PrismaClient } from '@org/db/client'
 
 declare global {
   namespace App {

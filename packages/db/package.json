@@ -2,30 +2,33 @@
   "name": "@org/db",
   "version": "0.0.1",
   "private": true,
-  "main": "generated/index.js",
-  "types": "generated/index.d.ts",
-  "browser": "generated/index-browser.js",
-  "type": "commonjs",
+  "main": "generated/client.ts",
+  "types": "generated/client.ts",
+  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     ".": {
       "import": "./generated/index.js"
+    },
+    "./client": {
+      "import": "./generated/client.ts"
     }
   },
   "scripts": {
     "prod:migrate": "prisma migrate deploy",
     "build": "prisma generate",
-    "migrate": "prisma migrate dev && ts-node ./prisma/zod-schemas.ts",
+    "migrate": "prisma migrate dev && tsx ./prisma/zod-schemas.ts",
     "delete": "prisma migrate reset",
     "format": "prisma format",
-    "reset": "prisma migrate reset && ts-node ./prisma/seed.ts && ts-node ./prisma/zod-schemas.ts",
-    "seed": "ts-node ./prisma/seed.ts",
-    "zod": "ts-node ./prisma/zod-schemas.ts"
+    "reset": "prisma migrate reset && tsx ./prisma/seed.ts && tsx ./prisma/zod-schemas.ts",
+    "seed": "tsx ./prisma/seed.ts",
+    "zod": "tsx ./prisma/zod-schemas.ts"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
+    "dotenv": "^17.2.1",
     "prisma": "^6.12.0",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "zod-prisma-types": "^3.2.4"
   },
   "dependencies": {

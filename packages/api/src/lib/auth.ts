@@ -4,7 +4,7 @@ import { db } from '$lib/db'
 
 import type { Endpoints } from '@octokit/types'
 import type { GoogleProfile } from '@org/lib/schemas'
-import { UserStatus, type PrismaClient } from '@org/db'
+import { UserStatus, type PrismaClient } from '@org/db/client'
 
 export type GitHubUserData = Endpoints['GET /user']['response']['data']
 

@@ -1,6 +1,10 @@
+import dotenv from 'dotenv'
+
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+
+dotenv.config({ quiet: true })
 
 /**
  * Writes zod/index.ts to lib as base schema
@@ -38,8 +42,8 @@ async function processZodIndex(zodContent: string) {
 
 export async function main() {
   console.log('Updating lib prisma zod schemas...')
-  // const __filename = fileURLToPath(import.meta.url)
-  // const __dirname = path.dirname(__filename)
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = path.dirname(__filename)
 
   const zodPath = path.join(__dirname, '../zod/index.ts')
   const prismaTypesPath = path.join(__dirname, './prisma-types.ts')

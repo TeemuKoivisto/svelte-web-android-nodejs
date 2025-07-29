@@ -74,6 +74,18 @@ export const UserScalarFieldEnumSchema = z.enum([
   'updated_at'
 ])
 
+export const TaskScalarFieldEnumSchema = z.enum([
+  'id',
+  'title',
+  'content',
+  'status',
+  'created_at',
+  'updated_at',
+  'archived_at',
+  'trashed_at',
+  'user_id'
+])
+
 export const SortOrderSchema = z.enum(['asc', 'desc'])
 
 export const QueryModeSchema = z.enum(['default', 'insensitive'])
@@ -83,6 +95,10 @@ export const NullsOrderSchema = z.enum(['first', 'last'])
 export const UserStatusSchema = z.enum(['DISABLED', 'ACTIVE'])
 
 export type UserStatusType = `${z.infer<typeof UserStatusSchema>}`
+
+export const TaskStatusSchema = z.enum(['BACKLOG', 'TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE'])
+
+export type TaskStatusType = `${z.infer<typeof TaskStatusSchema>}`
 
 /////////////////////////////////////////
 // MODELS
@@ -178,6 +194,7 @@ export type User = z.infer<typeof UserSchema>
 export type UserRelations = {
   accounts: AccountWithRelations[]
   sessions: SessionWithRelations[]
+  tasks: TaskWithRelations[]
 }
 
 export type UserWithRelations = z.infer<typeof UserSchema> & UserRelations
@@ -185,7 +202,41 @@ export type UserWithRelations = z.infer<typeof UserSchema> & UserRelations
 export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.merge(
   z.object({
     accounts: z.lazy(() => AccountWithRelationsSchema).array(),
-    sessions: z.lazy(() => SessionWithRelationsSchema).array()
+    sessions: z.lazy(() => SessionWithRelationsSchema).array(),
+    tasks: z.lazy(() => TaskWithRelationsSchema).array()
+  })
+)
+
+/////////////////////////////////////////
+// TASK SCHEMA
+/////////////////////////////////////////
+
+export const TaskSchema = z.object({
+  status: TaskStatusSchema,
+  id: z.string().cuid(),
+  title: z.string(),
+  content: JsonValueSchema,
+  created_at: z.coerce.date(),
+  updated_at: z.coerce.date(),
+  archived_at: z.coerce.date().nullable(),
+  trashed_at: z.coerce.date().nullable(),
+  user_id: z.string()
+})
+
+export type Task = z.infer<typeof TaskSchema>
+
+// TASK RELATION SCHEMA
+//------------------------------------------------------
+
+export type TaskRelations = {
+  user: UserWithRelations
+}
+
+export type TaskWithRelations = z.infer<typeof TaskSchema> & TaskRelations
+
+export const TaskWithRelationsSchema: z.ZodType<TaskWithRelations> = TaskSchema.merge(
+  z.object({
+    user: z.lazy(() => UserWithRelationsSchema)
   })
 )
 

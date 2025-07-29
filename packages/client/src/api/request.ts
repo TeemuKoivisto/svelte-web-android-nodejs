@@ -9,3 +9,7 @@ export const authApi = {
   authGoogle: (body: { code: string }) =>
     post('oauth/google/authorize', body, schemas.AUTH_RESP.parse)
 }
+
+export const tasksApi = {
+  list: () => get('api/tasks', z.array(schemas.STORE_TASK).parse)
+}

@@ -1,4 +1,5 @@
-import { PrismaClient } from '@org/db'
+import { PrismaClient } from '@org/db/client'
+import { env } from '$env/dynamic/private'
 
 declare global {
   var cachedPrisma: PrismaClient
@@ -6,10 +7,13 @@ declare global {
 
 let prisma: PrismaClient
 if (process.env.NODE_ENV === 'production') {
-  prisma = new PrismaClient()
+  prisma = new PrismaClient({
+    datasourceUrl: env.DATABASE_URL
+  })
 } else {
   if (!global.cachedPrisma) {
     global.cachedPrisma = new PrismaClient({
+      datasourceUrl: env.DATABASE_URL
       // log: ["query"],
     })
   }

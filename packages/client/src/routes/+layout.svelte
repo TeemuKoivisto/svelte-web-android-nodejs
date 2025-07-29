@@ -20,7 +20,4 @@
   </main>
 </div>
 
-<!-- <main>
-  {@render children()}
-</main> -->
 <!-- <Modal /> -->
