@@ -1,6 +1,7 @@
 <script lang="ts">
-  import Droppable from './droppable.svelte'
-  import SortableItem from './sortable-item.svelte'
+  import Icon from '@iconify/svelte/dist/OfflineIcon.svelte'
+  import plus from '@iconify-icons/mdi/plus'
+  import { crossfade } from 'svelte/transition'
   import {
     DndContext,
     DragOverlay,
@@ -9,28 +10,25 @@
     type DragStartEvent
   } from '@dnd-kit-svelte/core'
   import { SortableContext, arrayMove } from '@dnd-kit-svelte/sortable'
+
+  import Droppable from './droppable.svelte'
+  import SortableItem from './sortable-item.svelte'
   import { dropAnimation, sensors } from './dnd-utils'
-  import { crossfade } from 'svelte/transition'
 
-  interface Todo {
-    id: string
-    content: string
-    done: boolean
-  }
+  import { tasksMap, taskStore } from '$stores/task-store'
+  import { STORE_TASK, type StoreTask, type TaskStatusType } from '@org/lib/schemas'
+  import z from 'zod'
 
-  const defaultTasks: Todo[] = [
-    { id: 'task-1', content: 'Learn Svelte', done: false },
-    { id: 'task-2', content: 'Build a Kanban board', done: false },
-    { id: 'task-3', content: 'Review code', done: false },
-    { id: 'task-4', content: 'Setup project', done: false }
-  ]
-
-  let todos = $state<Todo[]>(defaultTasks)
+  let tasks = $state<StoreTask[]>([])
   let activeId = $state<string | null>(null)
 
-  const activeTodo = $derived(todos.find(todo => todo.id === activeId))
-  const done = $derived(todos.filter(task => task.done))
-  const inProgress = $derived(todos.filter(task => !task.done))
+  const activeTask = $derived(tasks.find(task => task.id === activeId))
+  const done = $derived(tasks.filter(task => task.status === 'DONE'))
+  const inProgress = $derived(tasks.filter(task => task.status === 'IN_PROGRESS'))
+
+  tasksMap.subscribe(map => {
+    tasks = Array.from(map.values())
+  })
 
   function handleDragStart(event: DragStartEvent) {
     activeId = event.active.id as string
@@ -39,42 +37,64 @@
   function handleDragEnd({ active, over }: DragEndEvent) {
     if (!over) return
 
-    if (over.id === 'done' || over.id === 'in-progress') {
-      todos.find(todo => todo.id === active.id)!.done = over.id === 'done'
+    // console.log('dropped to', over)
+    if (over.id === 'DONE' || over.id === 'IN_PROGRESS') {
+      const found = tasks.find(todo => todo.id === active.id)
+      if (found) {
+        found.status = over.id as TaskStatusType
+        taskStore.update(activeId as string, {
+          status: over.id as TaskStatusType
+        })
+      }
       return
     }
 
-    const overTodo = $state.snapshot(todos.find(todo => todo.id === over?.id))
-    if (!overTodo || activeId === overTodo.id) return
+    const overTask = $state.snapshot(tasks.find(todo => todo.id === over?.id))
+    if (!overTask || activeId === overTask.id) return
 
-    const oldIndex = todos.findIndex(todo => todo.id === active.id)
-    const newIndex = todos.findIndex(todo => todo.id === over.id)
-    todos = arrayMove(todos, oldIndex, newIndex)
+    const oldIndex = tasks.findIndex(task => task.id === active.id)
+    const newIndex = tasks.findIndex(task => task.id === over.id)
+    const activeTask = tasks[oldIndex]
+    tasks = arrayMove(tasks, oldIndex, newIndex)
 
+    // @TODO save new order to db
+    const old = $tasksMap.get(activeId as string)
+    if (old?.status !== activeTask.status) {
+      taskStore.update(activeTask.id, {
+        status: activeTask.status
+      })
+    }
     activeId = null
   }
 
   function handleDragOver({ active, over }: DragOverEvent) {
     if (!over) return
 
-    const activeTask = todos.find(todo => todo.id === active.id)
+    const activeTask = tasks.find(todo => todo.id === active.id)
     if (!activeTask) return
 
     // Handle container drag-over
     if (over.id === 'done' || over.id === 'in-progress') {
-      activeTask.done = over.id === 'done'
+      activeTask.status = over.id as TaskStatusType
       return
     }
 
     // Handle item drag-over
-    const overTask = todos.find(todo => todo.id === over.id)
+    const overTask = tasks.find(todo => todo.id === over.id)
     if (!overTask) return
 
     // Update the active task's done status to match the container it's being dragged over
-    activeTask.done = overTask.done
+    activeTask.status = overTask.status
   }
 
   const [send, recieve] = crossfade({ duration: 100 })
+
+  function createTask() {
+    taskStore.create({
+      status: 'IN_PROGRESS',
+      title: 'untitled'
+    })
+  }
 </script>
 
 <DndContext
@@ -84,18 +104,18 @@
   onDragOver={handleDragOver}
 >
   <div class="grid gap-4 md:grid-cols-2">
-    {@render taskList('in-progress', 'In Progress', inProgress)}
-    {@render taskList('done', 'Done', done)}
+    {@render taskList('IN_PROGRESS', 'In Progress', inProgress)}
+    {@render taskList('DONE', 'Done', done)}
   </div>
 
   <DragOverlay {dropAnimation}>
-    {#if activeTodo && activeId}
-      <SortableItem task={activeTodo} />
+    {#if activeTask && activeId}
+      <SortableItem task={activeTask} />
     {/if}
   </DragOverlay>
 </DndContext>
 
-{#snippet taskList(id: string, title: string, tasks: Todo[])}
+{#snippet taskList(id: TaskStatusType, title: string, tasks: StoreTask[])}
   <SortableContext items={tasks}>
     <Droppable class="rd-3xl bg-gray-100 p-3 pt-6" {id}>
       <p class="fw-bold pb-3 text-lg">{title}</p>
@@ -110,3 +130,13 @@
     </Droppable>
   </SortableContext>
 {/snippet}
+
+<div class="mr-2 group-hover:visible">
+  <button
+    class="m-2 flex items-center justify-between rounded-md px-2 py-1 pr-4 text-sm font-medium hover:bg-gray-100"
+    onclick={createTask}
+  >
+    <Icon icon={plus} width={16} height={16} />
+    <span class="ml-2">New task</span>
+  </button>
+</div>

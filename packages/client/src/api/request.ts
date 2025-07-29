@@ -12,5 +12,10 @@ export const authApi = {
 }
 
 export const tasksApi = {
-  list: () => get('api/tasks', z.array(schemas.STORE_TASK).parse)
+  list: () => get('api/tasks', z.array(schemas.STORE_TASK).parse),
+  create: (body: z.infer<typeof schemas.TASK_CREATE>) =>
+    post('api/tasks', body, schemas.STORE_TASK.parse),
+  update: (id: string, body: z.infer<typeof schemas.TASK_UPDATE>) =>
+    patch<null>(`api/tasks/${id}`, body),
+  delete: (id: string) => del<null>(`api/tasks/${id}`)
 }

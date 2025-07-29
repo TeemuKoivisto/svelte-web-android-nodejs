@@ -20,5 +20,26 @@ export const taskStore: TaskStore = {
       tasksMap.merge(res.data)
     }
     return res
+  },
+  create: async values => {
+    const res = await tasksApi.create(values)
+    if ('data' in res) {
+      tasksMap.merge([res.data])
+    }
+    return res
+  },
+  delete: async id => {
+    const res = await tasksApi.delete(id)
+    if ('data' in res || res.code === 404) {
+      tasksMap.remove(id)
+    }
+    return res
+  },
+  update: async (id, values) => {
+    const res = await tasksApi.update(id, values)
+    if ('data' in res) {
+      tasksMap.merge([{ id, ...values }])
+    }
+    return res
   }
 }

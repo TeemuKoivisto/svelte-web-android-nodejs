@@ -1,6 +1,6 @@
 import z from 'zod'
 
-import { TaskSchema } from './prisma'
+import { TaskSchema, TaskStatusSchema } from './prisma'
 import { zAnyDateTime } from './utils'
 
 export type StoreTask = z.infer<typeof STORE_TASK>
@@ -15,3 +15,9 @@ export const STORE_TASK = TaskSchema.omit({
   archived_at: z.union([z.null(), zAnyDateTime]),
   trashed_at: z.union([z.null(), zAnyDateTime])
 })
+
+export const TASK_CREATE = z.object({
+  status: TaskStatusSchema,
+  title: z.string()
+})
+export const TASK_UPDATE = TASK_CREATE.partial()

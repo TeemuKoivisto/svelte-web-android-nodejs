@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { error, type RequestEvent } from '@sveltejs/kit'
-import { UserSchema } from '@org/lib/schemas'
+import { TaskSchema, TaskStatusSchema, UserSchema } from '@org/lib/schemas'
 
 type Handler = {
   body?: z.ZodTypeAny
@@ -8,7 +8,7 @@ type Handler = {
   response?: z.ZodTypeAny
 }
 
-export const api = {
+export const oauth = {
   'POST /oauth/github/authorize': {
     body: z.object({
       code: z.string()
@@ -25,6 +25,30 @@ export const api = {
     })
   }
 } satisfies Record<string, Handler>
+
+export const tasks = {
+  'POST /api/tasks': {
+    body: z.object({
+      status: TaskStatusSchema,
+      title: z.string()
+    }),
+    response: TaskSchema
+  },
+  'PATCH /api/tasks/:taskId': {
+    body: z
+      .object({
+        status: TaskStatusSchema,
+        title: z.string()
+      })
+      .partial(),
+    response: z.null()
+  }
+}
+
+const api = {
+  ...oauth,
+  ...tasks
+}
 
 type InferBody<K extends keyof typeof api> = (typeof api)[K] extends { body: z.ZodTypeAny }
   ? z.infer<(typeof api)[K]['body']>

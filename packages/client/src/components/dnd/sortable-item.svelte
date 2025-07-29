@@ -1,14 +1,10 @@
 <script lang="ts">
-  import type { UniqueIdentifier } from '@dnd-kit-svelte/core'
   import { CSS, styleObjectToString } from '@dnd-kit-svelte/utilities'
   import { useSortable } from '@dnd-kit-svelte/sortable'
+  import type { StoreTask } from '@org/lib/schemas'
 
-  interface Task {
-    id: UniqueIdentifier
-    content: string
-  }
-
-  let { task }: { task: Task } = $props()
+  let { task }: { task: StoreTask } = $props()
+  let content = $derived(JSON.stringify(task.content))
 
   const { attributes, listeners, node, transform, transition, isDragging, isSorting } = useSortable(
     {
@@ -34,7 +30,8 @@
 >
   <!-- Original element - becomes invisible during drag but maintains dimensions -->
   <div class={['rd-18px bg-white p-4', { invisible: isDragging.current }]}>
-    {task.content}
+    <h3>{task.title}</h3>
+    <article>{content}</article>
   </div>
 
   <!-- Drag placeholder - set to match original dimensions -->
