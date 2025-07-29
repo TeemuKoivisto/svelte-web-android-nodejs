@@ -10,7 +10,7 @@
     children: Snippet<[]>
   }
 
-  let { children, ...rest }: Props = $props()
+  let { children }: Props = $props()
 </script>
 
 <div class="flex-col items-center">

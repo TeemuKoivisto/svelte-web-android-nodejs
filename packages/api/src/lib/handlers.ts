@@ -83,7 +83,7 @@ export const handle =
     if ('query' in handler) {
       const intoObject = event.url.searchParams
         .entries()
-        .reduce<Record<string, any>>((acc, cur) => {
+        .reduce<Record<string, string>>((acc, cur) => {
           acc[cur[0]] = cur[1]
           return acc
         }, {})

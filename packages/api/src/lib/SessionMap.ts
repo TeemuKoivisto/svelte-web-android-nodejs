@@ -19,7 +19,6 @@ type Session = {
  */
 export class SessionMap {
   map = new Map<Jwt, Session>()
-  // idsToJwts = new Map<string, string>()
   time = Date.now()
 
   get(jwt: Jwt): Result<Session> {
@@ -45,6 +44,28 @@ export class SessionMap {
         expires_at: session.expires_at.getTime()
       })
     }
+    return session
+  }
+
+  async upsert(userId: string, jwt: Jwt, expires_at: Date, oauthToken?: string) {
+    const session = await db.session.upsert({
+      where: { user_id: userId },
+      create: {
+        oauthToken,
+        jwt,
+        user_id: userId,
+        expires_at
+      },
+      update: {
+        oauthToken,
+        jwt,
+        expires_at
+      }
+    })
+    this.map.set(session.jwt, {
+      ...session,
+      expires_at: session.expires_at.getTime()
+    })
     return session
   }
 

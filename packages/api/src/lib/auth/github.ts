@@ -1,13 +1,15 @@
-import type { Endpoints } from '@octokit/types'
-import { UserStatus, type PrismaClient } from '@org/db/client'
+import { error } from '@sveltejs/kit'
 import { env } from '$env/dynamic/private'
+
+import { UserStatus, type PrismaClient } from '@org/db/client'
+import type { Endpoints } from '@octokit/types'
 import type { Result } from '@org/lib'
 
 export type GitHubUserData = Endpoints['GET /user']['response']['data']
 
 export async function fetchGithubUser(code: string): Promise<
   Result<{
-    access_token: string
+    accessToken: string
     githubUser: GitHubUserData
   }>
 > {
@@ -31,27 +33,19 @@ export async function fetchGithubUser(code: string): Promise<
     headers: {
       Accept: 'application/vnd.github.v3+json',
       Authorization: `token ${result.access_token}`,
-      'User-Agent': 'teemukoivisto-xyz-cf-worker'
+      'User-Agent': 'svelte-web-android-nodejs'
     }
   })
   const githubUser = await user.json()
   return {
     data: {
-      access_token: result.access_token,
+      accessToken: result.access_token,
       githubUser
     }
   }
 }
 
 export async function findOrCreateGithubUser(data: GitHubUserData, db: PrismaClient) {
-  // const key = await env.USERS_KV.get(data.id.toString())
-  // const user = getUser(key)
-  // const prisma = env.prisma()
-  // if (user?.p === 'github' && user.user_id) {
-  //   return prisma.user.findUnique({
-  //     where: { id: user.user_id }
-  //   })
-  // }
   const acc = await db.account.findFirst({
     where: {
       provider: 'github',
@@ -63,32 +57,23 @@ export async function findOrCreateGithubUser(data: GitHubUserData, db: PrismaCli
   })
   if (acc) {
     return acc.user
+  } else if (!data.email) {
+    return error(400, `No valid email address for GitHub account: ${JSON.stringify(data)}`)
   }
   const created = await db.user.create({
     data: {
       name: data.name || '',
-      email: data.email || '',
+      email: data.email,
       image: data.avatar_url,
-      status: UserStatus.ACTIVE
-    }
-    // select: {
-    //   id: true,
-    //   email: true,
-    //   name: true,
-    // }
-  })
-  const _account = await db.account.create({
-    data: {
-      user_id: created.id,
-      type: 'oauth',
-      provider: 'github',
-      providerAccountId: data.id.toString()
+      status: UserStatus.ACTIVE,
+      accounts: {
+        create: {
+          type: 'oauth',
+          provider: 'github',
+          providerAccountId: data.id.toString()
+        }
+      }
     }
   })
-  // const kvUser: KVUser = {
-  //   p: 'github',
-  //   user_id: created.id
-  // }
-  // await env.USERS_KV.put(data.id.toString(), JSON.stringify(kvUser))
   return created
 }
