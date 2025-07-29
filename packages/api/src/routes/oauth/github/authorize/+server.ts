@@ -1,12 +1,13 @@
-import { error } from '@sveltejs/kit'
 import { base64url, SignJWT } from 'jose'
-
-import { db } from '$lib/db'
-import { AUDIENCE, findOrCreateGithubUser, ISSUER } from '$lib/auth'
+import { error } from '@sveltejs/kit'
 import { dev } from '$app/environment'
 import { env } from '$env/dynamic/private'
 
+import { AUDIENCE, findOrCreateGithubUser, ISSUER } from '$lib/auth'
+import { db } from '$lib/db'
+import { handle } from '$lib/handlers'
 import { AUTH_RESP } from '@org/lib/schemas'
+
 import type { RequestHandler } from './$types'
 import type { z } from 'zod'
 import type { Endpoints } from '@octokit/types'
@@ -14,7 +15,7 @@ import type { Endpoints } from '@octokit/types'
 type GitHubUserData = Endpoints['GET /user']['response']['data']
 
 export const POST: RequestHandler = async event => {
-  const { code }: { code: string } = await event.request.json()
+  const { body } = await handle(event)('POST /oauth/github/authorize')
   const response = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',
     headers: {
@@ -24,7 +25,7 @@ export const POST: RequestHandler = async event => {
     body: JSON.stringify({
       client_id: env.GITHUB_OAUTH_CLIENT_ID,
       client_secret: env.GITHUB_OAUTH_CLIENT_SECRET,
-      code
+      code: body.code
     })
   })
   const result: { access_token?: string; error?: string } = await response.json()
@@ -82,11 +83,11 @@ export const POST: RequestHandler = async event => {
     secure: !dev,
     maxAge: monthExpiry
   })
-  const body: z.infer<typeof AUTH_RESP> = {
+  const resp: z.infer<typeof AUTH_RESP> = {
     user: dbUser,
     expires: Date.now() + monthExpiry * 1000
   }
-  return new Response(JSON.stringify(body), {
+  return new Response(JSON.stringify(resp), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'

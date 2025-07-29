@@ -1,12 +1,9 @@
 import { error } from '@sveltejs/kit'
+import { handle } from '$lib/handlers'
 
 import type { RequestHandler } from './$types'
 
 export const GET: RequestHandler = async event => {
-  const uri = event.url.searchParams.get('redirect_uri')
-  const location = event.url.searchParams.get('location')
-  if (uri) {
-    return Response.redirect(`${uri}?location=${location}`, 301)
-  }
-  return error(404, 'No redirect_uri in search params')
+  const { query } = await handle(event)('GET /oauth/github/callback')
+  return Response.redirect(`${query.redirect_uri}?location=${query.location}`, 301)
 }
