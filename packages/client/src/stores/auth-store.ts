@@ -37,7 +37,7 @@ export const authStore = {
     const resp = await authApi.authGithub({ code })
     if ('data' in resp) {
       currentUser.set(resp.data.user)
-      tokenExpires.set(resp.data.expires)
+      tokenExpires.set(resp.data.expiryInSeconds)
     }
     return resp
   },

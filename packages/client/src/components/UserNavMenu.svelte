@@ -1,7 +1,8 @@
 <script lang="ts">
   import * as DropdownMenu from '$shadcn/ui/dropdown-menu/index.js'
-
+  
   import { authStore, currentUser } from '$stores/auth-store'
+  import { API_URL } from '$config'
 </script>
 
 <DropdownMenu.Root>
@@ -28,7 +29,7 @@
       <DropdownMenu.DropdownMenuItem class="p-0">
         <a
           class="flex h-full w-full items-center px-2 py-1.5"
-          href={`http://localhost:5181/oauth/github/login?redirect_uri=${location.origin}/oauth/github?redirect=${location.pathname}`}
+          href={`${API_URL}/oauth/github/login?redirect_uri=${location.origin}/callbacks/github?redirect=${location.pathname}`}
         >
           <img class="mr-3 h-[16px]" src="github-icon.svg" alt="Github logo" />
           GitHub

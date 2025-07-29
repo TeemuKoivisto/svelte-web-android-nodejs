@@ -3,7 +3,7 @@ import { UserSchema } from './prisma'
 
 export const AUTH_RESP = z.object({
   user: UserSchema,
-  expires: z.number().int()
+  expiryInSeconds: z.number().int().min(0)
 })
 
 export const GOOGLE_OAUTH_RESP = z.object({
