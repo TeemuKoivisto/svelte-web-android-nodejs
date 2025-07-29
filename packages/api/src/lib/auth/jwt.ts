@@ -2,12 +2,12 @@ import { base64url, jwtVerify, SignJWT, type JWTPayload } from 'jose'
 import { env } from '$env/dynamic/private'
 import type { User } from '@org/lib/schemas'
 
-export const ISSUER = 'svelte-web-android-nodejs.pages.dev'
-export const AUDIENCE = 'svelte-web-android-nodejs.pages.dev:oauth'
+const ISSUER = 'svelte-web-android-nodejs.pages.dev'
+const AUDIENCE = 'svelte-web-android-nodejs.pages.dev:oauth'
 const EXPIRY = 60 * 60 * 24 * 30 // 30 days
 const SECRET = base64url.decode(env.JWT_SECRET as string)
 
-type JwtPayload = {
+export type JwtPayload = {
   user_id: string
   email: string
   superUser: boolean
