@@ -13,5 +13,5 @@ In short:
 5. Set as **Homepage URL** http://localhost:5180
 6. Set as **Authorization callback URL** http://localhost:5180/callbacks/github
 7. Copy **Client ID** as `GITHUB_OAUTH_CLIENT_ID` for `packages/api/.env`
-8. Click **Generate a new client secret** and set it as `GITHUB_OAUTH_CLIENT_SECRET`
-9. You should be able to login with GitHub!
+8. Click **Generate a new client secret** and set it as `GITHUB_OAUTH_CLIENT_SECRET` in `packages/api/.env`
+9. Try logging in at http://localhost:5180 It should show GitHub Oauth prompt & redirect correctly

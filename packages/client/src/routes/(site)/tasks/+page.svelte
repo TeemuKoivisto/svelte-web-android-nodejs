@@ -1,6 +1,9 @@
 <script lang="ts">
-  import { tasksList, taskStore } from '$stores/task-store'
   import { onMount } from 'svelte'
+
+  import SortableList from '$components/dnd/sortable-list.svelte'
+
+  import { tasksList, taskStore } from '$stores/task-store'
 
   onMount(() => {
     taskStore.list()
@@ -15,6 +18,7 @@
       <li>{task.title}</li>
     {/each}
   </ul>
+  <SortableList />
 </section>
 
 <style lang="postcss">

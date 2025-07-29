@@ -117,6 +117,15 @@ importers:
 
   packages/client:
     dependencies:
+      '@dnd-kit-svelte/core':
+        specifier: ^0.0.11
+        version: 0.0.11(svelte@5.37.0)
+      '@dnd-kit-svelte/sortable':
+        specifier: ^0.0.11
+        version: 0.0.11(svelte@5.37.0)
+      '@dnd-kit-svelte/utilities':
+        specifier: ^0.0.11
+        version: 0.0.11(svelte@5.37.0)
       '@iconify-icons/mdi':
         specifier: ^1.2.48
         version: 1.2.48
@@ -276,6 +285,26 @@ packages:
   '@csstools/css-tokenizer@3.0.4':
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
     engines: {node: '>=18'}
+
+  '@dnd-kit-svelte/accessibility@0.0.11':
+    resolution: {integrity: sha512-YkMjzabpnwELyeOSC2COV6EIGWZM8m4kgi/wIMwG0g/ZO3WWuzkMiLRLhYZqRkrEdpoz5tZnVclw+x/kcUjQHw==}
+    peerDependencies:
+      svelte: ^5.0.0
+
+  '@dnd-kit-svelte/core@0.0.11':
+    resolution: {integrity: sha512-bVqutZhSOk3nQsjwJ0SveUrPeBgUO/wajfon1AiKA8mxfQhaUG97CfoQLs7tLW3YxSkHkLPhYRw9WQat7OMB7g==}
+    peerDependencies:
+      svelte: ^5.0.0
+
+  '@dnd-kit-svelte/sortable@0.0.11':
+    resolution: {integrity: sha512-QeFvpjR9KAIVFs0/S4kGtzSNZzEmIp+d8DiNCRUeVC2E4Z5P4INzdzJl7m1EM7UjvdNayfLWcMhLpyTIHqHxQQ==}
+    peerDependencies:
+      svelte: ^5.0.0
+
+  '@dnd-kit-svelte/utilities@0.0.11':
+    resolution: {integrity: sha512-Y9Z016gLdieHiAVoteSBa1tvrgug1/Rl5wdKw/2g1Fd4G0q9HWIyPe2evKrv8H5ePfcNegA1jN7fneDVmHd3pQ==}
+    peerDependencies:
+      svelte: ^5.0.0
 
   '@esbuild/aix-ppc64@0.25.8':
     resolution: {integrity: sha512-urAvrUedIqEiFR3FYSLTWQgLu5tb+m0qZw0NBEasUeo6wuqatkMDaRT+1uABiGXEu5vqgPd7FGE1BhsAIy9QVA==}
@@ -2044,6 +2073,11 @@ packages:
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
 
+  runed@0.23.4:
+    resolution: {integrity: sha512-9q8oUiBYeXIDLWNK5DfCWlkL0EW3oGbk845VdKlPeia28l751VpfesaB/+7pI6rnbx1I6rqoZ2fZxptOJLxILA==}
+    peerDependencies:
+      svelte: ^5.7.0
+
   runed@0.29.2:
     resolution: {integrity: sha512-0cq6cA6sYGZwl/FvVqjx9YN+1xEBu9sDDyuWdDW1yWX7JF2wmvmVKfH+hVCZs+csW+P3ARH92MjI3H9QTagOQA==}
     peerDependencies:
@@ -2191,6 +2225,12 @@ packages:
         optional: true
       typescript:
         optional: true
+
+  svelte-toolbelt@0.7.1:
+    resolution: {integrity: sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
+    peerDependencies:
+      svelte: ^5.0.0
 
   svelte-toolbelt@0.9.3:
     resolution: {integrity: sha512-HCSWxCtVmv+c6g1ACb8LTwHVbDqLKJvHpo6J8TaqwUme2hj9ATJCpjCPNISR1OCq2Q4U1KT41if9ON0isINQZw==}
@@ -2602,6 +2642,34 @@ snapshots:
       '@csstools/css-tokenizer': 3.0.4
 
   '@csstools/css-tokenizer@3.0.4': {}
+
+  '@dnd-kit-svelte/accessibility@0.0.11(svelte@5.37.0)':
+    dependencies:
+      '@dnd-kit-svelte/utilities': 0.0.11(svelte@5.37.0)
+      esm-env: 1.2.2
+      runed: 0.23.4(svelte@5.37.0)
+      svelte: 5.37.0
+
+  '@dnd-kit-svelte/core@0.0.11(svelte@5.37.0)':
+    dependencies:
+      '@dnd-kit-svelte/accessibility': 0.0.11(svelte@5.37.0)
+      '@dnd-kit-svelte/utilities': 0.0.11(svelte@5.37.0)
+      runed: 0.23.4(svelte@5.37.0)
+      svelte: 5.37.0
+      svelte-toolbelt: 0.7.1(svelte@5.37.0)
+
+  '@dnd-kit-svelte/sortable@0.0.11(svelte@5.37.0)':
+    dependencies:
+      '@dnd-kit-svelte/core': 0.0.11(svelte@5.37.0)
+      '@dnd-kit-svelte/utilities': 0.0.11(svelte@5.37.0)
+      runed: 0.23.4(svelte@5.37.0)
+      svelte: 5.37.0
+      svelte-toolbelt: 0.7.1(svelte@5.37.0)
+
+  '@dnd-kit-svelte/utilities@0.0.11(svelte@5.37.0)':
+    dependencies:
+      svelte: 5.37.0
+      svelte-toolbelt: 0.7.1(svelte@5.37.0)
 
   '@esbuild/aix-ppc64@0.25.8':
     optional: true
@@ -4239,6 +4307,11 @@ snapshots:
     dependencies:
       queue-microtask: 1.2.3
 
+  runed@0.23.4(svelte@5.37.0):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.37.0
+
   runed@0.29.2(svelte@5.37.0):
     dependencies:
       esm-env: 1.2.2
@@ -4342,6 +4415,13 @@ snapshots:
       postcss: 8.5.6
       postcss-load-config: 3.1.4(postcss@8.5.6)(ts-node@10.9.2(@types/node@24.1.0)(typescript@5.8.3))
       typescript: 5.8.3
+
+  svelte-toolbelt@0.7.1(svelte@5.37.0):
+    dependencies:
+      clsx: 2.1.1
+      runed: 0.23.4(svelte@5.37.0)
+      style-to-object: 1.0.9
+      svelte: 5.37.0
 
   svelte-toolbelt@0.9.3(svelte@5.37.0):
     dependencies:

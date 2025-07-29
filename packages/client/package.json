@@ -16,7 +16,6 @@
     "test": "TZ=UTC-3 vitest run"
   },
   "devDependencies": {
-    "@org/lib": "workspace:*",
     "@internationalized/date": "^3.8.2",
     "@lucide/svelte": "^0.515.0",
     "@sveltejs/adapter-static": "^3.0.8",
@@ -36,9 +35,12 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@org/lib": "workspace:*",
-    "@iconify/svelte": "^5.0.1",
+    "@dnd-kit-svelte/core": "^0.0.11",
+    "@dnd-kit-svelte/sortable": "^0.0.11",
+    "@dnd-kit-svelte/utilities": "^0.0.11",
     "@iconify-icons/mdi": "^1.2.48",
+    "@iconify/svelte": "^5.0.1",
+    "@org/lib": "workspace:*",
     "luxon": "^3.7.1",
     "zod": "^3.25.76"
   }

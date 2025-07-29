@@ -15,7 +15,6 @@ declare global {
         GOOGLE_CLIENT_SECRET: string
         JWT_SECRET: string
         DATABASE_URL: string
-        API_URL: string
       }
     }
     interface Locals {
