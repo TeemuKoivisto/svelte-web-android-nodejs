@@ -12,11 +12,11 @@ import type { z } from 'zod'
 
 export const POST: RequestHandler = async event => {
   const { body } = await handle(event)('POST /oauth/github/authorize')
-  const githubRes = await fetchGithubUser(body.code)
-  if ('err' in githubRes) {
-    return error(githubRes.code, githubRes.err)
+  const github = await fetchGithubUser(body.code)
+  if ('err' in github) {
+    return error(github.code, github.err)
   }
-  const dbUser = await findOrCreateGithubUser(githubRes.data.githubUser, db)
+  const dbUser = await findOrCreateGithubUser(github.data.githubUser, db)
   const { jwt, exp } = await signJwt(dbUser)
   // const session = {
   //   oauth: {

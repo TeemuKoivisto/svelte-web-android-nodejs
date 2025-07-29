@@ -3,12 +3,12 @@ import { derived, get, writable } from 'svelte/store'
 
 import { persist, reset } from './persist'
 import { authApi } from '$api/request'
-import type { User } from '@org/lib/schemas'
+import { type StoreUser, STORE_USER } from '@org/lib/schemas'
 
-type ClientUser = Omit<User, 'password'>
-
-export const currentUser = persist(writable<ClientUser | null>(null), {
-  key: 'current-user'
+export const currentUser = persist(writable<StoreUser | null>(null), {
+  key: 'current-user',
+  serialize: v => JSON.stringify(v),
+  deserialize: v => STORE_USER.nullable().parse(JSON.parse(v))
 })
 export const tokenExpires = persist(writable<number | null>(null), {
   key: 'token-expiry'
@@ -25,7 +25,12 @@ tokenExpires.subscribe(exp => {
   }
 })
 
-export const authStore = {
+type AuthStore = {
+  githubCallback(): Promise<ReturnType<typeof authApi.authGithub>>
+  logout: typeof authApi.logout
+}
+
+export const authStore: AuthStore = {
   async githubCallback(): Promise<ReturnType<typeof authApi.authGithub>> {
     const url = new URL(location.href)
     const code = url.searchParams.get('code')
@@ -36,13 +41,18 @@ export const authStore = {
     }
     const resp = await authApi.authGithub({ code })
     if ('data' in resp) {
-      currentUser.set(resp.data.user)
+      currentUser.set(STORE_USER.parse(resp.data.user))
       tokenExpires.set(resp.data.expiryInSeconds)
     }
     return resp
   },
-  logout() {
+  async logout() {
     reset()
     goto('/')
+    const res = await authApi.logout()
+    if ('err' in res) {
+      console.error(res)
+    }
+    return res
   }
 }

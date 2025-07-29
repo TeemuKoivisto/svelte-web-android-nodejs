@@ -19,7 +19,7 @@ declare global {
       }
     }
     interface Locals {
-      user?: SessionUser
+      user: SessionUser
     }
   }
 }

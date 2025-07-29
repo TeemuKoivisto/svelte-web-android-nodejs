@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as DropdownMenu from '$shadcn/ui/dropdown-menu/index.js'
-  
+
   import { authStore, currentUser } from '$stores/auth-store'
   import { API_URL } from '$config'
 </script>

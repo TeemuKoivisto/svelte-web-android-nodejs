@@ -7,7 +7,8 @@ export const authApi = {
   authGithub: (body: { code: string }) =>
     post('oauth/github/authorize', body, schemas.AUTH_RESP.parse),
   authGoogle: (body: { code: string }) =>
-    post('oauth/google/authorize', body, schemas.AUTH_RESP.parse)
+    post('oauth/google/authorize', body, schemas.AUTH_RESP.parse),
+  logout: () => post('oauth/logout', undefined)
 }
 
 export const tasksApi = {
