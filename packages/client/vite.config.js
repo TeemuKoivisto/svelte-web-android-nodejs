@@ -22,6 +22,9 @@ export default defineConfig({
       $utils: resolve('./src/utils')
     }
   },
+  server: {
+    port: 5180
+  },
   test: {
     globals: true,
     environment: 'jsdom',

@@ -18,7 +18,7 @@ export default defineConfig({
   //   include: ['@org/db']
   // },
   server: {
-    port: 5180
+    port: 5181
   },
   test: {
     globals: true,

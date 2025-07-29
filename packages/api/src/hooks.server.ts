@@ -15,6 +15,6 @@ export const handle = (async ({ event, resolve }) => {
     event.locals.user = await authenticate(event)
   }
   const resp = await resolve(event)
-  resp.headers.append('Access-Control-Allow-Origin', `*`)
+  // resp.headers.append('Access-Control-Allow-Origin', `*`)
   return resp
 }) satisfies Handle

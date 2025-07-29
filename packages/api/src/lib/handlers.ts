@@ -1,15 +1,21 @@
 import { z } from 'zod'
 import { error, type RequestEvent } from '@sveltejs/kit'
+import { UserSchema } from '@org/lib/schemas'
 
 type Handler = {
   body?: z.ZodTypeAny
   query?: z.ZodTypeAny
+  response?: z.ZodTypeAny
 }
 
 export const api = {
   'POST /oauth/github/authorize': {
     body: z.object({
       code: z.string()
+    }),
+    response: z.object({
+      user: UserSchema,
+      expires: z.number().int()
     })
   },
   'GET /oauth/github/callback': {

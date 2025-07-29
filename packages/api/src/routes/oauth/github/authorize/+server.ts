@@ -55,7 +55,7 @@ export const POST: RequestHandler = async event => {
   }
   const monthExpiry = 60 * 60 * 24 * 30 // 30 days
   const timeNow = Math.floor(Date.now() / 1000)
-  const secret = base64url.decode(env.JWT_SECRET || '')
+  const secret = base64url.decode(env.JWT_SECRET as string)
   const jwt = await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS512' })
     .setIssuedAt()
@@ -73,6 +73,7 @@ export const POST: RequestHandler = async event => {
     },
     access_token: result.access_token
   }
+  // await db.session.up
   // await event.platform.env.SESSIONS_KV.put(jwt, JSON.stringify(session), {
   //   expirationTtl: monthExpiry
   // })

@@ -28,7 +28,7 @@
       <DropdownMenu.DropdownMenuItem class="p-0">
         <a
           class="flex h-full w-full items-center px-2 py-1.5"
-          href={`/oauth/github/login?redirect_uri=${location.origin}/oauth/github?redirect=${location.pathname}`}
+          href={`http://localhost:5181/oauth/github/login?redirect_uri=${location.origin}/oauth/github?redirect=${location.pathname}`}
         >
           <img class="mr-3 h-[16px]" src="github-icon.svg" alt="Github logo" />
           GitHub
