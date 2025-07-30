@@ -1,5 +1,25 @@
 # [svelte-web-android-nodejs](https://github.com/TeemuKoivisto/svelte-web-android-nodejs)
 
+This my current boilerplate as of 2025. Static SvelteKit client with the API separated into own package so that I can deploy it to directly as CapacitorJS webview to Android. NodeJS with SvelteKit but it can be easily switched to eg. Cloudflare. For UI, I'm using Tailwind 4 and shadcn so I don't have to reinvent every component. High type-safety with generated zod schemas from Prisma used as the primary source of truth although using Luxon in client makes sharing same schema between server & client harder.
+
+Haven't added Terraform stacks yet but it's pretty standard Ansible + Terraform + Hetzner setup. This should suffice for any hobby project with minimal hosting costs, the most likely first bottle-neck would be managing multiple deployments of the API server. You can do that with eg. k3s, ECS or switching to Cloudflare adapter (although directly connecting to Postgres from Cloudflare workers could be inefficient).
+
+I'll try keeping this updated.
+
+## How to run
+
+You need NodeJS >= 20, pnpm >= 10, Docker & Docker Compose installed.
+
+1. Copy/edit .envs: `cp ./packages/db/.env-example ./packages/db/.env cp ./packages/api/.env-example ./packages/api/.env`
+2. Generate JWT_SECRET for API `.env`: `openssl rand -base64 32`
+3. Start posgres: `docker-compose up -d postgres`
+4. Install deps: `pnpm i`
+5. Build lib: `pnpm lib`
+6. Migrate & seed db: `pnpm --filter db migrate && pnpm --filter db seed`
+7. Start API: `pnpm api`
+8. Start client: `pnpm client`
+9. Site should open at http://localhost:5180/
+
 ## Oauth
 
 [Github](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app)

@@ -136,7 +136,7 @@
   <SortableContext items={tasks}>
     <div class="rd-3xl flex flex-col bg-gray-100 pt-3">
       <Droppable class="flex-grow p-2 pb-0" {id}>
-        <p class="fw-bold ml-3 pb-3 text-lg">{title}</p>
+        <p class="fw-bold ml-3 pb-3 text-lg font-bold">{title}</p>
         <div class="grid gap-2">
           {#each tasks as task (task.id)}
             <div class="" in:recieve={{ key: task.id }} out:send={{ key: task.id }}>

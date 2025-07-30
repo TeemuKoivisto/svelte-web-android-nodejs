@@ -23,6 +23,7 @@ export const searchIntoObject = (params: URLSearchParams) =>
     return acc
   }, {})
 
+// Can transform this into public, auth & adminHandler
 export const handler =
   <K extends keyof typeof routes, E extends RequestEvent>(
     key: K,
