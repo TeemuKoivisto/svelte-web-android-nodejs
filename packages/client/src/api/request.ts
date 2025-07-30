@@ -5,11 +5,6 @@ import { get, patch, post, del } from './methods'
 import { API_URL } from '$config'
 import type { Result } from '@org/lib'
 
-const DEFAULT_HEADERS = {
-  Accept: 'application/json',
-  'Content-Type': 'application/json'
-}
-
 export const authApi = {
   authGithub: (body: ApiOptions<'POST /oauth/github/authorize'>['body']) =>
     api('POST /oauth/github/authorize', { body }),
@@ -92,7 +87,7 @@ type ApiResponse<T extends RouteKey> = Promise<
 export function api<T extends RouteKey>(route: T, options?: ApiOptions<T>): ApiResponse<T> {
   const [method, ...urlParts] = route.split(' ')
   let url = urlParts.join('')
-  const { body, query, headers = DEFAULT_HEADERS, ...pathParams } = options || {}
+  const { body, query, headers, ...pathParams } = options || {}
 
   // Replace path parameters in the URL
   if (pathParams && Object.keys(pathParams).length > 0) {

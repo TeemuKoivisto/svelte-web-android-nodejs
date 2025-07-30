@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import { error, type RequestEvent } from '@sveltejs/kit'
+import { error, json, type RequestEvent } from '@sveltejs/kit'
 import { routes } from '@org/lib/schemas'
+import type { Result } from '@org/lib'
 
 type InferBody<K extends keyof typeof routes> = (typeof routes)[K] extends { body: z.ZodTypeAny }
   ? z.infer<(typeof routes)[K]['body']>
@@ -10,11 +11,17 @@ type InferQuery<K extends keyof typeof routes> = (typeof routes)[K] extends { qu
   ? z.infer<(typeof routes)[K]['query']>
   : undefined
 
+type InferResponse<K extends keyof typeof routes> = (typeof routes)[K] extends {
+  response: z.ZodTypeAny
+}
+  ? z.infer<(typeof routes)[K]['response']>
+  : any
+
 export const handle =
   (event: RequestEvent) =>
   async <K extends keyof typeof routes>(
     key: K
-  ): Promise<{ body: InferBody<K>; query: InferQuery<K> }> => {
+  ): Promise<{ body: InferBody<K>; query: InferQuery<K>; response: InferResponse<K> }> => {
     const handler = routes[key]
 
     let body: InferBody<K> = undefined
@@ -46,5 +53,27 @@ export const handle =
       query = parsed.data as InferQuery<K>
     }
 
-    return { body, query }
+    return { body, query, response: 'response' in handler ? handler.response : undefined } as {
+      body: InferBody<K>
+      query: InferQuery<K>
+      response: InferResponse<K>
+    }
   }
+
+export const handler = <K extends keyof typeof routes>(
+  key: K,
+  fn: (
+    event: RequestEvent,
+    body: InferBody<K>,
+    query: InferQuery<K>
+  ) => Promise<Result<InferResponse<K>>>
+) => {
+  return async (event: RequestEvent): Promise<Response> => {
+    const parsed = await handle(event)(key)
+    const result = await fn(event, parsed.body, parsed.query)
+    if ('err' in result) {
+      return error(result.code, result.err)
+    }
+    return json(result.data)
+  }
+}
