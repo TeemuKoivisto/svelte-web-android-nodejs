@@ -6,7 +6,7 @@ import { handle } from '$lib/handlers'
 import type { RequestHandler } from './$types'
 
 export const PATCH: RequestHandler = async event => {
-  const { body } = await handle(event)('PATCH /api/tasks/:taskId')
+  const { body } = await handle(event)('PATCH /api/tasks/{taskId}')
   const updated = await db.task.update({
     where: { id: event.params.task_id },
     data: {

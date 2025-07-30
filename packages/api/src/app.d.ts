@@ -1,4 +1,5 @@
 import type { PrismaClient } from '@org/db/client'
+import type { JwtPayload } from './lib/auth/jwt'
 
 declare global {
   namespace App {
@@ -18,7 +19,7 @@ declare global {
       }
     }
     interface Locals {
-      user: SessionUser
+      user: JwtPayload
     }
   }
 }

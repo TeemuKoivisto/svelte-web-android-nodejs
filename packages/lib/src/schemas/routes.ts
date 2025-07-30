@@ -45,14 +45,19 @@ export const tasks = {
     response: TaskSchema,
     client: STORE_TASK
   },
-  'PATCH /api/tasks/:taskId': {
+  'PATCH /api/tasks/{taskId}': {
     body: z
       .object({
         status: TaskStatusSchema,
         title: z.string()
       })
       .partial(),
-    response: z.null()
+    response: z.null(),
+    client: z.null()
+  },
+  'DELETE /api/tasks/{taskId}': {
+    response: z.null(),
+    client: z.null()
   }
 }
 
