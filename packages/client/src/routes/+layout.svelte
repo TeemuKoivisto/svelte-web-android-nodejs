@@ -1,6 +1,7 @@
 <script lang="ts">
   // import Modal from '$modals/Modal.svelte'
   import Navbar from '$components/Navbar.svelte'
+  import { Toaster } from '$shadcn/ui/sonner'
 
   import type { Snippet } from 'svelte'
 
@@ -21,3 +22,4 @@
 </div>
 
 <!-- <Modal /> -->
+<Toaster />

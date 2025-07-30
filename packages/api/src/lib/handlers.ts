@@ -17,63 +17,63 @@ type InferResponse<K extends keyof typeof routes> = (typeof routes)[K] extends {
   ? z.infer<(typeof routes)[K]['response']>
   : any
 
+// export const parseQuery = <T extends z.ZodTypeAny>(searchParams: URLSearchParams, schema: T) => {
+//   const intoObject = searchParams.entries().reduce<Record<string, string>>((acc, cur) => {
+//     acc[cur[0]] = cur[1]
+//     return acc
+//   }, {})
+//   return schema.safeParse(intoObject) as z.SafeParseReturnType<z.infer<T>, z.infer<T>>
+// }
+
+type ParsedBody<K extends keyof typeof routes> =
+  | z.SafeParseReturnType<any, InferBody<K>>
+  | undefined
+type ParsedQuery<K extends keyof typeof routes> =
+  | z.SafeParseReturnType<any, InferQuery<K>>
+  | undefined
+
+const searchIntoObject = (params: URLSearchParams) =>
+  params.entries().reduce<Record<string, string>>((acc, cur) => {
+    acc[cur[0]] = cur[1]
+    return acc
+  }, {})
+
 export const handle =
   (event: RequestEvent) =>
   async <K extends keyof typeof routes>(
     key: K
-  ): Promise<{ body: InferBody<K>; query: InferQuery<K>; response: InferResponse<K> }> => {
+  ): Promise<[ParsedBody<K>, z.SafeParseReturnType<any, InferQuery<K>> | undefined]> => {
     const handler = routes[key]
-
-    let body: InferBody<K> = undefined
-
-    // Handle body if it exists
-    if ('body' in handler) {
-      const jsonBody = await event.request.json()
-      const parsed = handler.body.safeParse(jsonBody)
-      if (parsed.error) {
-        return error(400, parsed.error.issues.join('\n'))
-      }
-      body = parsed.data as InferBody<K>
-    }
-
-    let query: InferQuery<K> = undefined
-
-    // Handle query if it exists
-    if ('query' in handler) {
-      const intoObject = event.url.searchParams
-        .entries()
-        .reduce<Record<string, string>>((acc, cur) => {
-          acc[cur[0]] = cur[1]
-          return acc
-        }, {})
-      const parsed = handler.query.safeParse(intoObject)
-      if (parsed.error) {
-        return error(400, parsed.error.issues.join('\n'))
-      }
-      query = parsed.data as InferQuery<K>
-    }
-
-    return { body, query, response: 'response' in handler ? handler.response : undefined } as {
-      body: InferBody<K>
-      query: InferQuery<K>
-      response: InferResponse<K>
-    }
+    return [
+      'body' in handler
+        ? (handler.body.safeParse(await event.request.json()) as ParsedBody<K>)
+        : undefined,
+      'query' in handler
+        ? (handler.query.safeParse(searchIntoObject(event.url.searchParams)) as ParsedQuery<K>)
+        : undefined
+    ]
   }
 
-export const handler = <K extends keyof typeof routes>(
-  key: K,
-  fn: (
-    event: RequestEvent,
-    body: InferBody<K>,
-    query: InferQuery<K>
-  ) => Promise<Result<InferResponse<K>>>
-) => {
-  return async (event: RequestEvent): Promise<Response> => {
-    const parsed = await handle(event)(key)
-    const result = await fn(event, parsed.body, parsed.query)
+export const handler =
+  <K extends keyof typeof routes>(
+    key: K,
+    fn: (
+      event: RequestEvent,
+      body: InferBody<K>,
+      query: InferQuery<K>
+    ) => Promise<Result<InferResponse<K>>>
+  ) =>
+  async (event: RequestEvent): Promise<Response> => {
+    const [body, query] = await handle(event)(key)
+    if (body?.error || query?.error) {
+      // @TODO show generic errors in prod?
+      return json(body?.error || query?.error, {
+        status: 400
+      })
+    }
+    const result = await fn(event, body?.data, query?.data)
     if ('err' in result) {
       return error(result.code, result.err)
     }
     return json(result.data)
   }
-}

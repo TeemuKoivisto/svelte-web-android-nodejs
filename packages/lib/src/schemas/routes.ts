@@ -3,7 +3,7 @@ import { TaskSchema, TaskStatusSchema, UserSchema } from './prisma'
 import { STORE_TASK } from './task'
 import { STORE_USER } from './user'
 
-type Handler = {
+type Route = {
   body?: z.ZodTypeAny
   query?: z.ZodTypeAny
   response?: z.ZodTypeAny
@@ -70,4 +70,4 @@ export const tasks = {
 export const routes = {
   ...oauth,
   ...tasks
-} satisfies Record<string, Handler>
+} satisfies Record<string, Route>

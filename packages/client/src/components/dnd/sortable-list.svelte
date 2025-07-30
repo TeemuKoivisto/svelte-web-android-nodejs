@@ -10,6 +10,7 @@
     type DragStartEvent
   } from '@dnd-kit-svelte/core'
   import { SortableContext, arrayMove } from '@dnd-kit-svelte/sortable'
+  import { toast } from 'svelte-sonner'
 
   import Droppable from './droppable.svelte'
   import SortableItem from './sortable-item.svelte'
@@ -51,6 +52,7 @@
         taskStore.update(activeId, {
           status: overStatus
         })
+        toast('Task moved')
       }
       return
     }
@@ -69,6 +71,7 @@
       taskStore.update(activeTask.id, {
         status: activeTask.status
       })
+      toast('Task moved')
     }
     activeId = null
   }
@@ -95,11 +98,16 @@
 
   const [send, recieve] = crossfade({ duration: 100 })
 
-  function createTask(status: TaskStatusType) {
-    taskStore.create({
+  async function createTask(status: TaskStatusType) {
+    const res = await taskStore.create({
       status,
       title: 'untitled'
     })
+    if ('data' in res) {
+      toast.success('New task created')
+    } else {
+      toast.error('Failed to create task')
+    }
   }
 </script>
 
