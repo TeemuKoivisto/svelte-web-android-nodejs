@@ -15,9 +15,3 @@ export const STORE_TASK = TaskSchema.omit({
   archived_at: z.union([z.null(), zAnyDateTime]),
   trashed_at: z.union([z.null(), zAnyDateTime])
 })
-
-export const TASK_CREATE = z.object({
-  status: TaskStatusSchema,
-  title: z.string()
-})
-export const TASK_UPDATE = TASK_CREATE.partial()

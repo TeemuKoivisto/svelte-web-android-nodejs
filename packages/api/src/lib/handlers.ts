@@ -1,69 +1,21 @@
 import { z } from 'zod'
 import { error, type RequestEvent } from '@sveltejs/kit'
-import { TaskSchema, TaskStatusSchema, UserSchema } from '@org/lib/schemas'
+import { routes } from '@org/lib/schemas'
 
-type Handler = {
-  body?: z.ZodTypeAny
-  query?: z.ZodTypeAny
-  response?: z.ZodTypeAny
-}
-
-export const oauth = {
-  'POST /oauth/github/authorize': {
-    body: z.object({
-      code: z.string()
-    }),
-    response: z.object({
-      user: UserSchema,
-      expires: z.number().int()
-    })
-  },
-  'GET /oauth/github/callback': {
-    query: z.object({
-      redirect_uri: z.string().url(),
-      location: z.string()
-    })
-  }
-}
-
-export const tasks = {
-  'POST /api/tasks': {
-    body: z.object({
-      status: TaskStatusSchema,
-      title: z.string()
-    }),
-    response: TaskSchema
-  },
-  'PATCH /api/tasks/:taskId': {
-    body: z
-      .object({
-        status: TaskStatusSchema,
-        title: z.string()
-      })
-      .partial(),
-    response: z.null()
-  }
-}
-
-const api = {
-  ...oauth,
-  ...tasks
-} satisfies Record<string, Handler>
-
-type InferBody<K extends keyof typeof api> = (typeof api)[K] extends { body: z.ZodTypeAny }
-  ? z.infer<(typeof api)[K]['body']>
+type InferBody<K extends keyof typeof routes> = (typeof routes)[K] extends { body: z.ZodTypeAny }
+  ? z.infer<(typeof routes)[K]['body']>
   : undefined
 
-type InferQuery<K extends keyof typeof api> = (typeof api)[K] extends { query: z.ZodTypeAny }
-  ? z.infer<(typeof api)[K]['query']>
+type InferQuery<K extends keyof typeof routes> = (typeof routes)[K] extends { query: z.ZodTypeAny }
+  ? z.infer<(typeof routes)[K]['query']>
   : undefined
 
 export const handle =
   (event: RequestEvent) =>
-  async <K extends keyof typeof api>(
+  async <K extends keyof typeof routes>(
     key: K
   ): Promise<{ body: InferBody<K>; query: InferQuery<K> }> => {
-    const handler = api[key]
+    const handler = routes[key]
 
     let body: InferBody<K> = undefined
 

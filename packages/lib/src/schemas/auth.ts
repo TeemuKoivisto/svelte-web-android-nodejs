@@ -1,10 +1,4 @@
 import z from 'zod'
-import { UserSchema } from './prisma'
-
-export const AUTH_RESP = z.object({
-  user: UserSchema,
-  expiryInSeconds: z.number().int().min(0)
-})
 
 export const GOOGLE_OAUTH_RESP = z.object({
   access_token: z.string(),

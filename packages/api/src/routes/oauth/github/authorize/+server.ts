@@ -6,7 +6,7 @@ import { signJwt } from '$lib/auth/jwt'
 import { db } from '$lib/db'
 import { handle } from '$lib/handlers'
 import { sessionMap } from '$lib/SessionMap'
-import { AUTH_RESP } from '@org/lib/schemas'
+import { oauth } from '@org/lib/schemas'
 
 import type { RequestHandler } from './$types'
 import type { z } from 'zod'
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async event => {
     secure: !dev,
     expires: expires_at
   })
-  const resp: z.infer<typeof AUTH_RESP> = {
+  const resp: z.infer<(typeof oauth)['POST /oauth/github/authorize']['response']> = {
     user: dbUser,
     expiryInSeconds: exp
   }

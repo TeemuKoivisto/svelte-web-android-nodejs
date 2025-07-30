@@ -7,15 +7,15 @@ type Session = {
   expires_at: number
   user_id: string
   oauthToken: string | null
-  jwt: string
+  jwt: Jwt
 }
 
 /**
  * Use in-memory SessionMap to avoid constant bombarding of session table & faster auth.
  *
  * This works great with single server setup but with multiple servers sessions will get out-of-sync.
- * I've used Postgres triggers to keep these auth services in-sync before, but since they will
- * become a bottleneck at some point, Redis (or Cloudflare KV) would be a better choice.
+ * I've used Postgres triggers to keep these auth services in-sync before, but they might become a
+ * a bottleneck at some point (way later down the road). Redis (or Cloudflare KV) might be then a better choice.
  */
 export class SessionMap {
   map = new Map<Jwt, Session>()
@@ -26,7 +26,7 @@ export class SessionMap {
     this.time = Date.now()
     if (!found) {
       return { err: 'Session not found', code: 404 }
-    } else if (found.expires_at > this.time) {
+    } else if (found.expires_at < this.time) {
       return { err: 'Session expired', code: 403 }
     }
     return { data: found }
