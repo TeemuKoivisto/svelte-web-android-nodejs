@@ -11,20 +11,17 @@ const DEFAULT_HEADERS = {
 }
 
 export const authApi = {
-  authGithub: (body: { code: string }) =>
-    post('oauth/github/authorize', body, routes['POST /oauth/github/authorize'].client.parse),
-  authGoogle: (body: { code: string }) =>
-    post('oauth/google/authorize', body, routes['POST /oauth/github/authorize'].client.parse),
-  logout: () => post('oauth/logout', undefined)
+  authGithub: (body: ApiOptions<'POST /oauth/github/authorize'>['body']) =>
+    api('POST /oauth/github/authorize', { body }),
+  logout: () => api('POST /oauth/logout')
 }
 
 export const tasksApi = {
-  list: () => get('api/tasks', routes['GET /api/tasks'].client.parse),
-  create: (body: z.infer<(typeof routes)['POST /api/tasks']['body']>) =>
-    post('api/tasks', body, routes['POST /api/tasks'].client.parse),
-  update: (id: string, body: z.infer<(typeof routes)['PATCH /api/tasks/{taskId}']['body']>) =>
-    patch<null>(`api/tasks/${id}`, body),
-  delete: (id: string) => del<null>(`api/tasks/${id}`)
+  list: () => api('GET /api/tasks'),
+  create: (body: ApiOptions<'POST /api/tasks'>['body']) => api('POST /api/tasks', { body }),
+  update: (id: string, body: ApiOptions<'PATCH /api/tasks/{taskId}'>['body']) =>
+    api('PATCH /api/tasks/{taskId}', { taskId: id, body }),
+  delete: (id: string) => api('DELETE /api/tasks/{taskId}', { taskId: id })
 }
 
 type RouteKey = keyof typeof routes
@@ -39,10 +36,10 @@ type ExtractPathParams<T extends string> = T extends `${string}{${infer Param}}$
 
 /**
  * Creates a type for path parameters based on the route string
- * Example: PathParams<'PATCH /api/tasks/{taskId}'> = { taskId: string | number }
+ * Example: PathParams<'PATCH /api/tasks/{taskId}'> = { taskId: string }
  */
 type PathParams<T extends string> = {
-  [K in ExtractPathParams<T>]: string | number
+  [K in ExtractPathParams<T>]: string
 }
 
 /**
@@ -110,17 +107,16 @@ export function api<T extends RouteKey>(route: T, options?: ApiOptions<T>): ApiR
 
   // Get the route schema for parsing
   const routeSchema = routes[route]
-
-  // Construct the full URL with query parameters
+  // Remove '/' from URL
   let fullUrl = url.slice(1)
   if (query) {
     // Parse and validate query parameters using the route's query schema
     const parsedQuery =
       'query' in routeSchema && routeSchema.query ? routeSchema.query.parse(query) : query
-
     const searchParams = new URLSearchParams(parsedQuery)
     fullUrl += `?${searchParams.toString()}`
   }
+
   const parseResponse =
     'client' in routeSchema && routeSchema.client ? routeSchema.client.parse : (v: unknown) => v
 

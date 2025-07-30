@@ -29,6 +29,12 @@ export const oauth = {
       redirect_uri: z.string().url(),
       location: z.string()
     })
+  },
+  'POST /oauth/google/authorize': {
+    response: z.null()
+  },
+  'POST /oauth/logout': {
+    response: z.null()
   }
 }
 
