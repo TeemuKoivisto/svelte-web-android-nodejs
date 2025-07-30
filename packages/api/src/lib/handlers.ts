@@ -24,15 +24,11 @@ export const searchIntoObject = (params: URLSearchParams) =>
   }, {})
 
 export const handler =
-  <K extends keyof typeof routes>(
+  <K extends keyof typeof routes, E extends RequestEvent>(
     key: K,
-    fn: (
-      event: RequestEvent,
-      body: InferBody<K>,
-      query: InferQuery<K>
-    ) => Promise<Result<InferResponse<K>>>
+    fn: (event: E, body: InferBody<K>, query: InferQuery<K>) => Promise<Result<InferResponse<K>>>
   ) =>
-  async (event: RequestEvent): Promise<Response> => {
+  async (event: E): Promise<Response> => {
     const handler = routes[key]
     const body = 'body' in handler ? handler.body.safeParse(await event.request.json()) : undefined
     const query =
