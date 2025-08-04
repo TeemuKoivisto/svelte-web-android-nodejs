@@ -1,9 +1,9 @@
 import z from 'zod'
 
 import { routes } from '@org/lib/schemas'
-import { get, patch, post, del } from './methods'
+import { DEFAULT_HEADERS } from './methods'
 import { API_URL } from '$config'
-import type { Result } from '@org/lib'
+import { wrappedFetch, type Result } from '@org/lib'
 
 export const authApi = {
   authGithub: (body: ApiOptions<'POST /oauth/github/authorize'>['body']) =>
@@ -84,10 +84,12 @@ type ApiResponse<T extends RouteKey> = Promise<
  *   query: { redirect_uri: 'http://localhost:3000', location: 'dashboard' }
  * })
  */
-export function api<T extends RouteKey>(route: T, options?: ApiOptions<T>): ApiResponse<T> {
+export async function api<T extends RouteKey>(route: T, options?: ApiOptions<T>): ApiResponse<T> {
+  const routeSchema = routes[route]
   const [method, ...urlParts] = route.split(' ')
+  const { body, query, headers = DEFAULT_HEADERS, ...pathParams } = options || {}
   let url = urlParts.join('')
-  const { body, query, headers, ...pathParams } = options || {}
+  url = url.startsWith('/') ? url.slice(1) : url
 
   // Replace path parameters in the URL
   if (pathParams && Object.keys(pathParams).length > 0) {
@@ -100,31 +102,19 @@ export function api<T extends RouteKey>(route: T, options?: ApiOptions<T>): ApiR
     })
   }
 
-  // Get the route schema for parsing
-  const routeSchema = routes[route]
-  // Remove '/' from URL
-  let fullUrl = url.slice(1)
   if (query) {
-    // Parse and validate query parameters using the route's query schema
-    const parsedQuery =
-      'query' in routeSchema && routeSchema.query ? routeSchema.query.parse(query) : query
+    const parsedQuery = 'query' in routeSchema ? routeSchema.query.parse(query) : query
     const searchParams = new URLSearchParams(parsedQuery)
-    fullUrl += `?${searchParams.toString()}`
+    url += `?${searchParams.toString()}`
   }
 
   const parseResponse =
     'client' in routeSchema && routeSchema.client ? routeSchema.client.parse : (v: unknown) => v
 
-  switch (method) {
-    case 'GET':
-      return get(fullUrl, parseResponse, headers)
-    case 'POST':
-      return post(fullUrl, body, parseResponse, headers)
-    case 'PATCH':
-      return patch(fullUrl, body, parseResponse, headers)
-    case 'DELETE':
-      return del(fullUrl, parseResponse, headers)
-    default:
-      throw new Error(`Unsupported HTTP method: ${method}`)
-  }
+  const resp = await wrappedFetch(`${API_URL}/${url}`, {
+    method,
+    headers,
+    ...(body && { body: JSON.stringify(body) })
+  })
+  return 'data' in resp && parseResponse ? { data: parseResponse(resp.data) } : resp
 }
