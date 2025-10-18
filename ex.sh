@@ -5,6 +5,12 @@ if [ -f .env ]; then
 fi
 
 case "$1" in
+db:connect)
+  psql ${DATABASE_URL}
+  ;;
+db:backup)
+  pg_dump ${DATABASE_URL} > db.backup
+  ;;
 ssh)
   shift
   SSH_PATH="$HOME/.ssh/$TF_VAR_ssh_key_name"
