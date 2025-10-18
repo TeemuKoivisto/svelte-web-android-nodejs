@@ -1,7 +1,7 @@
 import type { GoogleProfile } from '@org/lib/schemas'
 import { UserStatus, type PrismaClient } from '@org/db/client'
 
-export async function findOrCreateGoogleUser(data: GoogleProfile, prisma: PrismaClient) {
+export async function findOrCreateGoogleUser(data: GoogleProfile, db: PrismaClient) {
   // const key = await env.USERS_KV.get(data.sub)
   // const user = getUser(key)
   // const prisma = env.prisma()
@@ -10,7 +10,7 @@ export async function findOrCreateGoogleUser(data: GoogleProfile, prisma: Prisma
   //     where: { id: user.user_id }
   //   })
   // }
-  const acc = await prisma.account.findFirst({
+  const acc = await db.account.findFirst({
     where: {
       provider: 'google',
       providerAccountId: data.sub
@@ -22,26 +22,25 @@ export async function findOrCreateGoogleUser(data: GoogleProfile, prisma: Prisma
   if (acc) {
     return acc.user
   }
-  const created = await prisma.user.create({
+  const created = await db.user.create({
     data: {
       name: `${data.given_name} ${data.family_name}`,
       email: data.email,
       image: data.picture,
-      status: UserStatus.ACTIVE
+      status: UserStatus.ACTIVE,
+      accounts: {
+        create: {
+          type: 'oauth',
+          provider: 'google',
+          providerAccountId: data.sub
+        }
+      }
     },
     select: {
       id: true,
       email: true,
       name: true,
       image: true
-    }
-  })
-  const _account = await prisma.account.create({
-    data: {
-      user_id: created.id,
-      type: 'oauth',
-      provider: 'google',
-      providerAccountId: data.sub
     }
   })
   // const kvUser: KVUser = {

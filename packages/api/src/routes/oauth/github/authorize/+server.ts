@@ -12,7 +12,7 @@ import type { RequestHandler } from './$types'
 export const POST: RequestHandler = handler('POST /oauth/github/authorize', async (event, body) => {
   const github = await fetchGithubUser(body.code)
   if ('err' in github) {
-    return { err: github.err, code: github.code }
+    return github
   }
   const dbUser = await findOrCreateGithubUser(github.data.githubUser, db)
   const { jwt, exp } = await signJwt(dbUser)
