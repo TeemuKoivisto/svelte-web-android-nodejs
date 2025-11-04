@@ -26,5 +26,16 @@ export default defineConfig({
       ]
     }
   },
-  plugins: [dts()]
+  plugins: [
+    dts({
+      exclude: ['src/test-utils/**', 'src/**/*.test.*', 'src/**/*.spec.*']
+    })
+  ],
+  test: {
+    globals: true,
+    environment: 'node',
+    include: ['src/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    snapshotSerializers: ['src/test-utils/json-serializer.ts'],
+    cache: false
+  }
 })

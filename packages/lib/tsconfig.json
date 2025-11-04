@@ -1,8 +1,13 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "types": ["vitest/globals"],
     "lib": ["esnext", "dom", "dom.iterable"],
-    "target": "esnext"
+    "target": "esnext",
+    "paths": {
+      "$test-utils": ["./src/test-utils"],
+      "$test-utils/*": ["./src/test-utils/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules"]

@@ -21,11 +21,13 @@
   ],
   "scripts": {
     "build": "vite build",
-    "watch": "vite build --watch"
+    "watch": "vite build --watch",
+    "test": "TZ=UTC-3 vitest run"
   },
   "devDependencies": {
     "@types/luxon": "^3.6.2",
     "luxon": "^3.7.1",
+    "vitest": "^4.0.7",
     "zod": "^3.25.76"
   },
   "peerDependencies": {
