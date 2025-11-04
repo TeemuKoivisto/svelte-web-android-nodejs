@@ -1,6 +1,7 @@
 import type { Err, Result } from './utils'
 
-export type JSONValue =
+type JSONValue =
+  | null
   | string
   | number
   | boolean
@@ -55,7 +56,7 @@ export async function wrappedFetch<T>(
     resp = await fetch(uri, options)
   } catch (error: any) {
     const obj: Err = {
-      err: ((error.toString() as string).split('\n')[0] || '').trim(),
+      err: (String(error).split('\n')[0] || '').trim(),
       code: 500
     }
     if (error instanceof DOMException) {
